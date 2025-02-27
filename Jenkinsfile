@@ -1,12 +1,21 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout true // Prevents Jenkins from performing the default SCM checkout
+    }
+
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'git@github.com:Andreas0x07/docker-app.git'
+                git(
+                    branch: 'main',
+                    url: 'git@github.com:Andreas0x07/docker-app.git',
+                    credentialsId: 'github-ssh-key' // Reference to SSH credentials in Jenkins
+                )
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -14,6 +23,7 @@ pipeline {
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 script {
@@ -23,6 +33,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy Application') {
             steps {
                 script {
@@ -39,6 +50,12 @@ pipeline {
     post {
         always {
             cleanWs()
+        }
+        success {
+            echo "Pipeline completed successfully."
+        }
+        failure {
+            echo "Pipeline failed."
         }
     }
 }
