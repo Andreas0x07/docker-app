@@ -19,7 +19,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("Andreas0x07/docker-app:${env.BUILD_NUMBER}")
+                    def dockerImage = docker.build("Andreas0x07/docker-app:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -27,6 +27,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+                    def dockerImage = docker.image("Andreas0x07/docker-app:${env.BUILD_NUMBER}")
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                         dockerImage.push()
                     }
@@ -59,4 +60,3 @@ pipeline {
         }
     }
 }
-
