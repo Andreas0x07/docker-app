@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     options {
-        skipDefaultCheckout true // Prevents Jenkins from performing the default SCM checkout
+        skipDefaultCheckout true // Предотвращает выполнение стандартного SCM checkout
     }
 
     stages {
@@ -10,8 +10,8 @@ pipeline {
             steps {
                 git(
                     branch: 'main',
-                    url: 'git@github.com:Andreas0x07/docker-app.git',
-                    credentialsId: 'github-ssh-key' // Reference to SSH credentials in Jenkins
+                    url: 'git@github.com:andreas0x07/docker-app.git', // Убедитесь, что URL корректен
+                    credentialsId: 'github-ssh-key' // Ссылка на SSH-учетные данные в Jenkins
                 )
             }
         }
@@ -19,7 +19,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build("Andreas0x07/docker-app:${env.BUILD_NUMBER}")
+                    // Объявляем переменную с использованием def
+                    def dockerImage = docker.build("andreas0x07/docker-app:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -27,7 +28,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.image("Andreas0x07/docker-app:${env.BUILD_NUMBER}")
+                    // Объявляем переменную с использованием def
+                    def dockerImage = docker.image("andreas0x07/docker-app:${env.BUILD_NUMBER}")
+
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                         dockerImage.push()
                     }
@@ -38,11 +41,11 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    sh '''
+                    sh """
                         docker stop my-flask-app || true
                         docker rm my-flask-app || true
-                        docker run -d --name my-flask-app -p 8081:80 Andreas0x07/docker-app:${BUILD_NUMBER}
-                    '''
+                        docker run -d --name my-flask-app -p 8081:80 andreas0x07/docker-app:${env.BUILD_NUMBER}
+                    """
                 }
             }
         }
