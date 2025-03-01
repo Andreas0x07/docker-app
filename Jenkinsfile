@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     options {
-        skipDefaultCheckout true // Предотвращает выполнение стандартного SCM checkout
+        skipDefaultCheckout true
     }
 
     stages {
@@ -10,8 +10,8 @@ pipeline {
             steps {
                 git(
                     branch: 'main',
-                    url: 'git@github.com:andreas0x07/docker-app.git', // Убедитесь, что URL корректен
-                    credentialsId: 'github-ssh-key' // Ссылка на SSH-учетные данные в Jenkins
+                    url: 'git@github.com:andreas0x07/docker-app.git',
+                    credentialsId: 'github-ssh-key'
                 )
             }
         }
@@ -19,7 +19,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Объявляем переменную с использованием def
                     def dockerImage = docker.build("andreas0x07/docker-app:${env.BUILD_NUMBER}")
                 }
             }
@@ -28,7 +27,6 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Объявляем переменную с использованием def
                     def dockerImage = docker.image("andreas0x07/docker-app:${env.BUILD_NUMBER}")
 
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
